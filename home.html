@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhận diện biển số xe vượt đèn đỏ</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/home.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Nhận diện biển số xe vượt đèn đỏ</h1>
+            <button id="logoutBtn" class="btn btn-secondary">Đăng xuất</button>
+        </header>
+
+        <section class="upload-section">
+            <h2>Upload Video</h2>
+            <div class="upload-box" id="uploadBox">
+                <div class="upload-icon">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                    <span class="plus-icon">+</span>
+                </div>
+                <p class="upload-text">Kéo thả video vào đây hoặc</p>
+                <button class="btn btn-primary" id="selectVideoBtn">Chọn Video</button>
+                <p class="upload-hint">Hỗ trợ: MP4, WebM, AVI, JPG, PNG (Tối đa 100MB)</p>
+                <input type="file" id="videoInput" accept=".mp4,.webm,.avi,.jpg,.jpeg,.png" hidden>
+            </div>
+        </section>
+
+        <section class="video-list-section">
+            <div class="section-header">
+                <h2>Danh Sách Video</h2>
+                <span class="video-count">Tổng: <span id="videoCount">5</span> video</span>
+            </div>
+            <div class="table-container">
+                <table class="video-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>USER ID</th>
+                            <th>FILENAME</th>
+                            <th>FILEPATH</th>
+                            <th>STATUS</th>
+                            <th>CREATED AT</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="videoTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div style="text-align: center;">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Đang tải lên...</div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="platesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Kết quả nhận diện biển số xe</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="plates-grid" id="platesGrid">
+            </div>
+        </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/home.js"></script>
+</body>
+</html>
+

@@ -183,6 +183,7 @@ function renderVideoList(videos) {
     
     tbody.innerHTML = videos.map(video => {
         const canDownloadLog = video.status === 'completed' && video.log_path;
+        console.log(`Check Video ${video.filename}: status ${video.status} - log_path ${video.log_path}`)
         const downloadBtnText = canDownloadLog ? 'Tải Log' : 'Đang xử lý...';
         const downloadBtnDisabled = !canDownloadLog ? 'disabled' : '';
         
@@ -222,11 +223,19 @@ async function downloadLog(videoId, originalFilename) {
     try {
         showMessage('Đang chuẩn bị tải xuống...');
         
+        // const token = getFromStorage(StorageKeys.ACCESS_TOKEN);
+        // const response = await fetch(`${API_BASE_URL}/logs/download/${videoId}`, {
+        //     method: 'GET',
+        //     headers: {
+        //         ...(token && { 'Authorization': `Bearer ${token}` })
+        //     }
+        // });
+
         const token = getFromStorage(StorageKeys.ACCESS_TOKEN);
-        const response = await fetch(`${API_BASE_URL}/logs/download/${videoId}`, {
-            method: 'GET',
-            headers: {
-                ...(token && { 'Authorization': `Bearer ${token}` })
+        const response =  await fetch(`${API_BASE_URL}/logs/download/${videoId}`,{
+            method:'GET',
+            headers:{
+                ...(token && { 'Authorization':`Bearer ${token}`})
             }
         });
 

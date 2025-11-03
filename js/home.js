@@ -162,10 +162,11 @@ function renderVideoList(videos) {
     }
     
     tbody.innerHTML = videos.map(video => {
-        const canDownloadLog = video.status === 'completed' && video.log_path;
+        const canDownloadLog = video.status === 'completed' 
+        const isEmptyLog = video.log_path ===null
         console.log(`Check Video ${video.filename}: status ${video.status} - log_path ${video.log_path}`)
-        const downloadBtnText = canDownloadLog ? 'Tải Log' : 'Đang xử lý...';
-        const downloadBtnDisabled = !canDownloadLog ? 'disabled' : '';
+        const downloadBtnText = (canDownloadLog && !isEmptyLog) ? 'Tải Log' : (canDownloadLog && isEmptyLog) ? 'Không có vi phạm trong video' : 'Đang xử lý...';
+        const downloadBtnDisabled = !(canDownloadLog && !isEmptyLog) ? 'disabled' : '';
         
         return `
             <tr>

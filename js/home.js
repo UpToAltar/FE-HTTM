@@ -161,21 +161,32 @@ function renderVideoList(videos) {
         return;
     }
     
-    tbody.innerHTML = videos.map(video => `
-        <tr>
-            <td>${video.id}</td>
-            <td>${currentUser.id}</td>
-            <td>${video.filename}</td>
-            <td>${video.filepath}</td>
-            <td><span class="status-badge status-${video.status}">${getStatusText(video.status)}</span></td>
-            <td>${formatDate(video.created_at)}</td>
-            <td>
-                <div class="actions">
-                    <button class="btn btn-download" onclick="downloadVideo('${video.filepath}', '${video.filename}')">Tải xuống</button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = videos.map(video => {
+        const canDownloadLog = video.status === 'completed' && video.log_path;
+        console.log(`Check Video ${video.filename}: status ${video.status} - log_path ${video.log_path}`)
+        const downloadBtnText = canDownloadLog ? 'Tải Log' : 'Đang xử lý...';
+        const downloadBtnDisabled = !canDownloadLog ? 'disabled' : '';
+        
+        return `
+            <tr>
+                <td>${video.id}</td>
+                <td>${currentUser.id}</td>
+                <td>${video.filename}</td>
+                <td>${video.filepath}</td>
+                <td><span class="status-badge status-${video.status}">${getStatusText(video.status)}</span></td>
+                <td>${formatDate(video.created_at)}</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-download" 
+                                onclick="downloadLog(${video.id}, '${video.filename}')" 
+                                ${downloadBtnDisabled}>
+                            ${downloadBtnText}
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function getStatusText(status) {
@@ -188,18 +199,59 @@ function getStatusText(status) {
     return statusMap[status] || status;
 }
 
-function downloadVideo(filepath, filename) {
-    const downloadUrl = `http://localhost:8000${filepath}`;
-    
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = filename;
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    showMessage('Đang tải xuống...');
+async function downloadLog(videoId, originalFilename) {
+    try {
+        showMessage('Đang chuẩn bị tải xuống...');
+        
+        // const token = getFromStorage(StorageKeys.ACCESS_TOKEN);
+        // const response = await fetch(`${API_BASE_URL}/logs/download/${videoId}`, {
+        //     method: 'GET',
+        //     headers: {
+        //         ...(token && { 'Authorization': `Bearer ${token}` })
+        //     }
+        // });
+
+        const token = getFromStorage(StorageKeys.ACCESS_TOKEN);
+        const response =  await fetch(`${API_BASE_URL}/logs/download/${videoId}`,{
+            method:'GET',
+            headers:{
+                ...(token && { 'Authorization':`Bearer ${token}`})
+            }
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            showMessage(error.detail || 'Không thể tải xuống file log');
+            return;
+        }
+
+        // Lấy tên file từ header hoặc tạo tên mặc định
+        const contentDisposition = response.headers.get('Content-Disposition');
+        let filename = `log_${videoId}.zip`;
+        
+        if (contentDisposition) {
+            const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+            if (filenameMatch && filenameMatch[1]) {
+                filename = filenameMatch[1].replace(/['"]/g, '');
+            }
+        }
+
+        // Tạo blob và download
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        showMessage('Tải xuống thành công!');
+    } catch (error) {
+        console.error('Download error:', error);
+        showMessage('Có lỗi xảy ra khi tải xuống: ' + error.message);
+    }
 }
 
 function initLogout() {

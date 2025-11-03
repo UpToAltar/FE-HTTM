@@ -7,7 +7,6 @@ function initHome() {
 }
 
 function initUpload() {
-    const uploadBox = document.getElementById('uploadBox');
     const videoInput = document.getElementById('videoInput');
     const selectVideoBtn = document.getElementById('selectVideoBtn');
 
@@ -16,25 +15,6 @@ function initUpload() {
     });
 
     videoInput.addEventListener('change', handleFileSelect);
-
-    uploadBox.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadBox.classList.add('drag-over');
-    });
-
-    uploadBox.addEventListener('dragleave', () => {
-        uploadBox.classList.remove('drag-over');
-    });
-
-    uploadBox.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadBox.classList.remove('drag-over');
-        
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            handleFileUpload(files[0]);
-        }
-    });
 }
 
 function handleFileSelect(e) {
@@ -46,10 +26,10 @@ function handleFileSelect(e) {
 
 async function handleFileUpload(file) {
     const maxSize = 100 * 1024 * 1024;
-    const allowedTypes = ['video/mp4', 'video/webm', 'video/x-msvideo', 'image/jpeg', 'image/png', 'image/jpg'];
+    const allowedTypes = ['video/mp4', 'video/webm', 'video/x-msvideo', 'image/jpeg', 'image/png', 'image/jpg', 'video/quicktime'];
     
     if (!allowedTypes.includes(file.type)) {
-        showMessage('Chỉ hỗ trợ file MP4, WebM, AVI hoặc ảnh JPG, PNG!');
+        showMessage('Chỉ hỗ trợ file MP4, WebM, AVI, QUICKTIME, MOV hoặc ảnh JPG, PNG!');
         return;
     }
     
